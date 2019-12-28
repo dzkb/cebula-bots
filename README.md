@@ -2,7 +2,7 @@
 
 ## Contributing
 
-To begin, create a new virtual environtment, for example using the [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/install.html) package. After that, install dependencies:
+To begin, create a new virtual environment, for example using the [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/install.html) package. After that, install dependencies:
 
 ```bash
 $ pip install -r requirements.txt
