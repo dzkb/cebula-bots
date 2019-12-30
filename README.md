@@ -48,3 +48,11 @@ For tests, `pytest` package is used in following manner:
 ```bash
 $ python -m pytest
 ```
+
+## Code guidelines
+
+Code should be formatted using `black` and `isort`. Be sure to run the following before commiting:
+
+```bash
+black . && isort -y
+```
