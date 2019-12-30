@@ -10,7 +10,9 @@ from jobs.xkom import run as xkom
 
 all_jobs = [
     JobDefinition(
-        id="xkom", function=xkom, trigger=CronTrigger(hour="10,22", second="10")
+        id="xkom",
+        function=xkom,
+        trigger=CronTrigger(hour="10,22", minute="0", second="10"),
     ),
     JobDefinition(
         id="morele",
