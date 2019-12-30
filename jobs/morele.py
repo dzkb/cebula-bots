@@ -19,7 +19,7 @@ def _parse_morele(morele_site):
     new_price = morele_soup.find("div", {"class": "promo-box-new-price"}).text
     coupon = morele_soup.find("div", {"class": "promo-box-code-value"}).text
 
-    description = f"{old_price} → {new_price} (kod: {coupon})"
+    description = f"{old_price} → {new_price}\nkod: {coupon}"
 
     return Offer(
         title=title, description=description, offer_url=offer_url, image_url=image_url
