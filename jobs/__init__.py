@@ -1,8 +1,4 @@
-from datetime import datetime
-
 from apscheduler.triggers.cron import CronTrigger
-from apscheduler.triggers.interval import IntervalTrigger
-from pytz import utc
 
 from jobs.base import JobDefinition
 from jobs.morele import run as morele
@@ -17,8 +13,6 @@ all_jobs = [
     JobDefinition(
         id="morele",
         function=morele,
-        trigger=IntervalTrigger(
-            start_date=datetime(2019, 12, 27, 14, 0, tzinfo=utc), days=3, timezone=utc
-        ),
+        trigger=CronTrigger(day_of_week="0-4", hour="14", minute="0", second="10"),
     ),
 ]
