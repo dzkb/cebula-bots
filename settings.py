@@ -14,3 +14,6 @@ XKOM_DATA_URL = os.environ.get("XKOM_DATA_URL", "https://x-kom.pl")
 
 MORELE_DISCORD_HOOK_URL = os.environ.get("MORELE_DISCORD_HOOK_URL")
 MORELE_DATA_URL = os.environ.get("MORELE_DATA_URL", "https://morele.net")
+
+PROLINE_DISCORD_HOOK_URL = os.environ.get("PROLINE_DISCORD_HOOK_URL",)
+PROLINE_DATA_URL = os.environ.get("PROLINE_DATA_URL", "https://proline.pl")

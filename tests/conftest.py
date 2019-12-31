@@ -53,3 +53,25 @@ def morele_alert_html():
     </div>
 </div>
     """
+
+
+@pytest.fixture()
+def proline_headshot_html():
+    return """
+<div id="headshot">
+    <a class="fotka"
+        href="/product"
+        title="TestProduct"><img
+            src="/image.jpg"
+            title="TestProduct"
+            alt="TestProduct"></a>
+    <table id="karta">
+        <tbody>
+            <tr>
+                <td class="cena_old"><b>100,00</b>&nbsp;zł</td>
+                <td class="cena_new"><b>50,00</b>&nbsp;zł</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+    """
