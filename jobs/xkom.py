@@ -1,5 +1,5 @@
 import os
-from json import loads
+from json import JSONDecoder
 
 import requests
 from bs4 import BeautifulSoup
@@ -15,25 +15,32 @@ XKOM_HOT_SHOT_URL = "https://x-kom.pl/goracy_strzal"
 def _parse_xkom(xkom_site):
     xkom_soup = BeautifulSoup(xkom_site, "html.parser")
 
-    app_div = xkom_soup.find("div", id="app")
-
-    product_name = app_div.find("h1").get_text()
-
-    price_spans = (
-        app_div.find("div", order=3)
-        .find_all("div", recursive=False)[1]
-        .find_all("div", recursive=False)[1]
-        .find_all("span")[:2]
+    script = (
+        xkom_soup.find("div", class_="container")
+        .find("script", type=None)
+        .string
     )
 
-    old_price = price_spans[0].get_text()
-    new_price = price_spans[1].get_text()
+    pre_hotshot_marker = r'{"type":"HotShot","extend":'
 
-    subtitle = f"{old_price} → {new_price}"
+    hotshot_start_pos = script.find(pre_hotshot_marker) + len(
+        pre_hotshot_marker
+    )
 
-    json_script_content = app_div.find("script").string
+    hotshot, _ = JSONDecoder().raw_decode(script[hotshot_start_pos:])
 
-    image_url = loads(json_script_content)["image"][0]
+    product_name = hotshot["promotionName"]
+
+    old_price = hotshot["oldPrice"]
+    new_price = hotshot["price"]
+    promotion = hotshot["promotionGainTextLines"][1]
+    products_count = hotshot["promotionTotalCount"]
+    sold_count = hotshot["saleCount"]
+
+    subtitle = f"""~~{old_price}~~ → {new_price} (-{promotion})
+    Sprzedano {sold_count} z {products_count} szt."""
+
+    image_url = hotshot["promotionPhoto"]["thumbnailUrl"]
 
     return Offer(
         title=product_name,
