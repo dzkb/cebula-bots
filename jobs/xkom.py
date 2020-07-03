@@ -1,4 +1,5 @@
 import os
+from json import loads
 
 import requests
 from bs4 import BeautifulSoup
@@ -14,18 +15,28 @@ XKOM_HOT_SHOT_URL = "https://x-kom.pl/goracy_strzal"
 def _parse_xkom(xkom_site):
     xkom_soup = BeautifulSoup(xkom_site, "html.parser")
 
-    product_impression = xkom_soup.find("div", {"class": "product-impression"})
-    old_price = xkom_soup.find("div", {"class": "old-price"})
-    new_price = xkom_soup.find("div", {"class": "new-price"})
+    app_div = xkom_soup.find("div", id="app")
 
-    title = product_impression.p.text
-    subtitle = "{old_price} → {new_price}".format(
-        old_price=old_price.text, new_price=new_price.text
+    product_name = app_div.find("h1").get_text()
+
+    price_spans = (
+        app_div.find("div", order=3)
+        .find_all("div", recursive=False)[1]
+        .find_all("div", recursive=False)[1]
+        .find_all("span")[:2]
     )
-    image_url = product_impression.img["src"]
+
+    old_price = price_spans[0].get_text()
+    new_price = price_spans[1].get_text()
+
+    subtitle = f"{old_price} → {new_price}"
+
+    json_script_content = app_div.find("script").string
+
+    image_url = loads(json_script_content)["image"][0]
 
     return Offer(
-        title=title,
+        title=product_name,
         description=subtitle,
         offer_url=XKOM_HOT_SHOT_URL,
         image_url=image_url,
