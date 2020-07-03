@@ -37,7 +37,7 @@ def _parse_xkom(xkom_site):
     products_count = hotshot["promotionTotalCount"]
     sold_count = hotshot["saleCount"]
 
-    subtitle = f"""~~{old_price}~~ → {new_price} (-{promotion})
+    subtitle = f"""~~{old_price} zł~~ → {new_price} zł (-{promotion})
     Sprzedano {sold_count} z {products_count} szt."""
 
     image_url = hotshot["promotionPhoto"]["thumbnailUrl"]
