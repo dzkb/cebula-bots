@@ -1,5 +1,8 @@
+import logging
 import os
+from datetime import datetime
 from json import JSONDecoder
+from time import sleep
 
 import requests
 from bs4 import BeautifulSoup
@@ -15,19 +18,17 @@ XKOM_HOT_SHOT_URL = "https://x-kom.pl/goracy_strzal"
 def _parse_xkom(xkom_site):
     xkom_soup = BeautifulSoup(xkom_site, "html.parser")
 
-    script = (
-        xkom_soup.find("div", class_="container")
-        .find("script", type=None)
-        .string
-    )
+    script = xkom_soup.find("div", class_="container").find("script", type=None).string
 
     pre_hotshot_marker = r'{"type":"HotShot","extend":'
 
-    hotshot_start_pos = script.find(pre_hotshot_marker) + len(
-        pre_hotshot_marker
-    )
+    hotshot_start_pos = script.find(pre_hotshot_marker) + len(pre_hotshot_marker)
 
     hotshot, _ = JSONDecoder().raw_decode(script[hotshot_start_pos:])
+
+    promotionEnd = datetime.strptime(hotshot["promotionEnd"], r"%Y-%m-%dT%H:%M:%SZ")
+    if promotionEnd < datetime.now():
+        return None
 
     product_name = hotshot["promotionName"]
 
@@ -57,5 +58,20 @@ def run():
     xkom_site = requests.get(data_url)
     offer = _parse_xkom(xkom_site.text)
 
-    payload = format_offer_discord(offer)
-    discord_hook(hook_url, payload)
+    retries = 0
+    MAX_RETRIES = 5
+    while not offer and retries < MAX_RETRIES:
+        retries += 1
+        logging.getLogger("apscheduler").debug(
+            f"xkom_job retry {retries}/{MAX_RETRIES}"
+        )
+        xkom_site = requests.get(data_url)
+        offer = _parse_xkom(xkom_site.text)
+
+    if offer:
+        payload = format_offer_discord(offer)
+        discord_hook(hook_url, payload)
+    else:
+        logging.getLogger("apscheduler").warn(
+            f"xkom_job failed after {MAX_RETRIES} retries"
+        )
