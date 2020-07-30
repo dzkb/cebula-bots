@@ -15,17 +15,11 @@ XKOM_HOT_SHOT_URL = "https://x-kom.pl/goracy_strzal"
 def _parse_xkom(xkom_site):
     xkom_soup = BeautifulSoup(xkom_site, "html.parser")
 
-    script = (
-        xkom_soup.find("div", class_="container")
-        .find("script", type=None)
-        .string
-    )
+    script = xkom_soup.find("div", class_="container").find("script", type=None).string
 
     pre_hotshot_marker = r'{"type":"HotShot","extend":'
 
-    hotshot_start_pos = script.find(pre_hotshot_marker) + len(
-        pre_hotshot_marker
-    )
+    hotshot_start_pos = script.find(pre_hotshot_marker) + len(pre_hotshot_marker)
 
     hotshot, _ = JSONDecoder().raw_decode(script[hotshot_start_pos:])
 
