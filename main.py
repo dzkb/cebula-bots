@@ -19,7 +19,7 @@ if not settings.DEBUG:
 
 jobstores = {"default": SQLAlchemyJobStore(url=settings.SQLALCHEMY_JOB_STORE)}
 executors = {"default": ProcessPoolExecutor(5)}
-job_defaults = {"coalesce": False, "max_instances": 3, "misfire_grace_time": 180}
+job_defaults = {"coalesce": True, "max_instances": 1, "misfire_grace_time": 300}
 scheduler = BlockingScheduler(
     jobstores=jobstores, executors=executors, job_defaults=job_defaults, timezone=utc
 )
