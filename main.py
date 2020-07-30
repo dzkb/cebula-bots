@@ -11,7 +11,10 @@ import settings
 if not settings.DEBUG:
     import logging
 
-    logging.basicConfig()
+    logging.basicConfig(
+        format="%(asctime)s.%(msecs)03d [%(levelname)s] %(module)s.%(funcName)s: %(message)s",
+        datefmt=r"%H:%M:%S",
+    )
     logging.getLogger("apscheduler").setLevel(logging.DEBUG)
 
 jobstores = {"default": SQLAlchemyJobStore(url=settings.SQLALCHEMY_JOB_STORE)}
