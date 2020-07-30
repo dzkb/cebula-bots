@@ -20,10 +20,19 @@ job_defaults = {"coalesce": False, "max_instances": 3, "misfire_grace_time": 180
 scheduler = BlockingScheduler(
     jobstores=jobstores, executors=executors, job_defaults=job_defaults, timezone=utc
 )
-
 for job in jobs.all_jobs:
     scheduler.add_job(
         func=job.function, id=job.id, trigger=job.trigger, replace_existing=True
     )
 
-scheduler.start()
+
+def run():
+    try:
+        scheduler.start()
+    except (KeyboardInterrupt, SystemExit):
+        scheduler.shutdown(wait=False)
+        exit(0)
+
+
+if __name__ == "__main__":
+    run()
