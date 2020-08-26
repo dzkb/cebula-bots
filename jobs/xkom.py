@@ -65,7 +65,7 @@ def run():
         logging.getLogger("apscheduler").debug(
             f"xkom_job retry {retries}/{MAX_RETRIES}"
         )
-        sleep(60)
+        sleep(settings.XKOM_RETRY_DELAY_SECS)
         xkom_site = requests.get(data_url)
         offer = _parse_xkom(xkom_site.text)
 
