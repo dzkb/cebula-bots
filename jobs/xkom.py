@@ -59,7 +59,7 @@ def run():
     offer = _parse_xkom(xkom_site.text)
 
     retries = 0
-    MAX_RETRIES = 5
+    MAX_RETRIES = settings.XKOM_MAX_RETRIES
     while not offer and retries < MAX_RETRIES:
         retries += 1
         logging.getLogger("apscheduler").debug(
