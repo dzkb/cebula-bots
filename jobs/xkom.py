@@ -58,21 +58,32 @@ def run():
     xkom_site = requests.get(data_url)
     offer = _parse_xkom(xkom_site.text)
 
-    retries = 0
-    MAX_RETRIES = settings.XKOM_MAX_RETRIES
-    while not offer and retries < MAX_RETRIES:
-        retries += 1
-        logging.getLogger("apscheduler").debug(
-            f"xkom_job retry {retries}/{MAX_RETRIES}"
+    if not offer:
+        delay = settings.XKOM_RETRY_DELAY_SECS
+        max_retries = settings.XKOM_MAX_RETRIES
+        logging.getLogger("apscheduler").info(
+            f"xkom_job was fired too early. will retry up to {max_retries} times with {delay}s delay"
         )
-        sleep(settings.XKOM_RETRY_DELAY_SECS)
-        xkom_site = requests.get(data_url)
-        offer = _parse_xkom(xkom_site.text)
+
+        retries = 0
+        while not offer and retries < max_retries:
+            sleep(delay)
+            retries += 1
+            logging.getLogger("apscheduler").info(
+                f"xkom_job retry attempt {retries}/{max_retries}"
+            )
+            xkom_site = requests.get(data_url)
+            offer = _parse_xkom(xkom_site.text)
+
+        if offer:
+            logging.getLogger("apscheduler").info(
+                f"xkom_job succeeded after {retries} retries"
+            )
+        else:
+            logging.getLogger("apscheduler").warn(
+                f"xkom_job failed after {max_retries} retries"
+            )
 
     if offer:
         payload = format_offer_discord(offer)
         discord_hook(hook_url, payload)
-    else:
-        logging.getLogger("apscheduler").warn(
-            f"xkom_job failed after {MAX_RETRIES} retries"
-        )
