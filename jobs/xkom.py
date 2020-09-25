@@ -6,6 +6,7 @@ from time import sleep
 
 import requests
 from bs4 import BeautifulSoup
+from fake_useragent import UserAgent
 
 import settings
 from formatters import format_offer_discord
@@ -55,7 +56,12 @@ def run():
     hook_url = settings.XKOM_DISCORD_HOOK_URL
     data_url = settings.XKOM_DATA_URL
 
-    xkom_site = requests.get(data_url)
+    ua = UserAgent()
+
+    def get_response():
+        return requests.get(data_url, headers={"User-Agent": ua.random})
+
+    xkom_site = get_response()
     offer = _parse_xkom(xkom_site.text)
 
     retries = 0
@@ -66,7 +72,7 @@ def run():
             f"xkom_job retry {retries}/{MAX_RETRIES}"
         )
         sleep(settings.XKOM_RETRY_DELAY_SECS)
-        xkom_site = requests.get(data_url)
+        xkom_site = get_response()
         offer = _parse_xkom(xkom_site.text)
 
     if offer:
