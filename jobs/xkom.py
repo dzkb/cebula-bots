@@ -28,7 +28,7 @@ def _parse_xkom(xkom_site):
     hotshot, _ = JSONDecoder().raw_decode(script[hotshot_start_pos:])
 
     promotionEnd = datetime.strptime(hotshot["promotionEnd"], r"%Y-%m-%dT%H:%M:%SZ")
-    if promotionEnd < datetime.now():
+    if promotionEnd < datetime.utcnow():
         return None
 
     product_name = hotshot["promotionName"]
