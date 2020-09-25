@@ -56,12 +56,9 @@ def run():
     hook_url = settings.XKOM_DISCORD_HOOK_URL
     data_url = settings.XKOM_DATA_URL
 
-    ua = UserAgent()
+    headers = {"User-Agent": UserAgent().chrome}
 
-    def get_response():
-        return requests.get(data_url, headers={"User-Agent": ua.random})
-
-    xkom_site = get_response()
+    xkom_site = requests.get(data_url, headers=headers)
     offer = _parse_xkom(xkom_site.text)
 
     retries = 0
@@ -72,7 +69,7 @@ def run():
             f"xkom_job retry {retries}/{MAX_RETRIES}"
         )
         sleep(settings.XKOM_RETRY_DELAY_SECS)
-        xkom_site = get_response()
+        xkom_site = requests.get(data_url, headers=headers)
         offer = _parse_xkom(xkom_site.text)
 
     if offer:
