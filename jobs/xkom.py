@@ -85,8 +85,6 @@ def run():
             else:
                 if offer:
                     payload = format_offer_discord(offer)
-                    print(payload)
-                    exit(0)
                     discord_hook(settings.XKOM_DISCORD_HOOK_URL, payload)
                     return True
                 else:
