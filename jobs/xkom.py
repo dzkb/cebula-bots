@@ -69,31 +69,33 @@ def run():
         response = _get_response()
         if response.status_code == 200:
             try:
-                offer = _parse_xkom(response.json())
+                json_payload = response.json()
             except ValueError:
                 logging.getLogger("apscheduler").exception(
                     "xkom_job expected json payload as response but didn't get it! "
                     "scraping and/or parsing need to be investigated!"
                 )
                 return False
-            except KeyError:
+
+            try:
+                offer = _parse_xkom(json_payload)
+            except (KeyError, ValueError):
                 logging.getLogger("apscheduler").exception(
                     "xkom_job received unexpected json payload structure! scraping "
                     "and/or parsing need to be investigated!"
                 )
                 return False
-            else:
-                if offer:
-                    payload = format_offer_discord(offer)
-                    discord_hook(settings.XKOM_DISCORD_HOOK_URL, payload)
-                    return True
-                else:
-                    retries += 1
-                    logging.getLogger("apscheduler").debug(
-                        "xkom_job was fired too soon and will retry in "
-                        f"{settings.XKOM_RETRY_DELAY_SECS}s ({retries}/{MAX_RETRIES})"
-                    )
-                    sleep(settings.XKOM_RETRY_DELAY_SECS)
+
+            if offer:
+                payload = format_offer_discord(offer)
+                discord_hook(settings.XKOM_DISCORD_HOOK_URL, payload)
+                return True
+        retries += 1
+        logging.getLogger("apscheduler").debug(
+            "xkom_job was fired too soon and will retry in "
+            f"{settings.XKOM_RETRY_DELAY_SECS}s ({retries}/{MAX_RETRIES})"
+        )
+        sleep(settings.XKOM_RETRY_DELAY_SECS)
 
     logging.getLogger("apscheduler").warn(
         f"xkom_job failed after {MAX_RETRIES} retries"
