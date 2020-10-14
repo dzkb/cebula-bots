@@ -48,7 +48,7 @@ def _parse_xkom(hotshot, skip_date_check: bool = False):
     products_count = hotshot["PromotionTotalCount"]
     sold_count = hotshot["SaleCount"]
 
-    description = f"""~~{old_price} zł~~ → {new_price} zł (-{price_diff}zł/-{discount}%)
+    description = f"""~~{old_price}zł~~ → {new_price}zł (-{price_diff}zł/-{discount}%)
         Sprzedano {sold_count} z {products_count} szt."""
 
     image_url = hotshot["PromotionPhoto"]["ThumbnailUrl"]
