@@ -28,7 +28,7 @@ XKOM_HEADERS = {
 }
 
 
-def _send_request():
+def _get_response():
     return requests.get(XKOM_HOT_SHOT_API_URL, params=XKOM_PARAMS, headers=XKOM_HEADERS)
 
 
@@ -66,7 +66,7 @@ def run():
     MAX_RETRIES = 5
 
     while retries < MAX_RETRIES:
-        response = _send_request()
+        response = _get_response()
         if response.status_code == 200:
             try:
                 offer = _parse_xkom(response.json())
