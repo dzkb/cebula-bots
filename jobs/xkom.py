@@ -1,6 +1,5 @@
 import logging
 from datetime import datetime
-from decimal import Decimal
 from time import sleep
 
 import requests
@@ -8,12 +7,12 @@ import settings
 from formatters import format_offer_discord
 from hooks import discord_hook
 
-from jobs.base import Offer
+from jobs.base import Offer, prepare_description
 
-XKOM_HOT_SHOT_URL = "https://x-kom.pl/goracy_strzal"
-XKOM_HOT_SHOT_API_URL = "https://mobileapi.x-kom.pl/api/v1/xkom/hotShots/current"
-XKOM_PARAMS = {"onlyHeader": "true"}
-XKOM_HEADERS = {
+OFFER_URL = "https://x-kom.pl/goracy_strzal"
+URL = "https://mobileapi.x-kom.pl/api/v1/xkom/hotShots/current"
+PARAMS = {"onlyHeader": "true"}
+HEADERS = {
     "accept": "application/json, text/plain, */*",
     "accept-language": "pl-PL,pl;q=0.9,en-US;q=0.8,en;q=0.7",
     "sec-fetch-dest": "empty",
@@ -29,7 +28,7 @@ XKOM_HEADERS = {
 
 
 def _get_response():
-    return requests.get(XKOM_HOT_SHOT_API_URL, params=XKOM_PARAMS, headers=XKOM_HEADERS)
+    return requests.get(URL, params=PARAMS, headers=HEADERS)
 
 
 def _parse_xkom(hotshot, skip_date_check: bool = False):
@@ -38,25 +37,24 @@ def _parse_xkom(hotshot, skip_date_check: bool = False):
         # fired too soon
         return False
 
-    title = hotshot["PromotionName"]
+    old_price = str(hotshot["OldPrice"])
+    new_price = str(hotshot["Price"])
 
-    old_price = Decimal(hotshot["OldPrice"])
-    new_price = Decimal(hotshot["Price"])
-    price_diff = Decimal(hotshot["PromotionGainValue"])
-    discount = round(100 * price_diff / old_price)
+    offer_url = OFFER_URL
+    image_url = hotshot["PromotionPhoto"]["ThumbnailUrl"]
+    title = hotshot["PromotionName"]
 
     products_count = hotshot["PromotionTotalCount"]
     sold_count = hotshot["SaleCount"]
 
-    description = f"""~~{old_price}zł~~ → {new_price}zł (-{price_diff}zł/-{discount}%)
-        Sprzedano {sold_count} z {products_count} szt."""
-
-    image_url = hotshot["PromotionPhoto"]["ThumbnailUrl"]
+    description = prepare_description(
+        old_price, new_price, f"Sprzedano {sold_count} z {products_count} szt."
+    )
 
     return Offer(
         title=title,
         description=description,
-        offer_url=XKOM_HOT_SHOT_URL,
+        offer_url=offer_url,
         image_url=image_url,
     )
 
