@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 import settings
 from formatters import format_offer_discord
 from hooks import discord_hook
-from jobs.base import JobDefinition, Offer
+from jobs.base import Offer
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36",

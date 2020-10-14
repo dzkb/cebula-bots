@@ -1,5 +1,3 @@
-import os
-
 from apscheduler.executors.pool import ProcessPoolExecutor
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.blocking import BlockingScheduler

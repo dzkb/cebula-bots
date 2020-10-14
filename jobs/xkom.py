@@ -1,5 +1,4 @@
 import logging
-import os
 from datetime import datetime
 from json import JSONDecoder
 from time import sleep
@@ -11,7 +10,8 @@ from fake_useragent import UserAgent
 import settings
 from formatters import format_offer_discord
 from hooks import discord_hook
-from jobs.base import JobDefinition, Offer
+
+from jobs.base import Offer
 
 XKOM_HOT_SHOT_URL = "https://x-kom.pl/goracy_strzal"
 
