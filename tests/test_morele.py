@@ -1,5 +1,3 @@
-import pytest
-
 from jobs.morele import _parse_morele
 
 

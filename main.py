@@ -1,5 +1,3 @@
-import os
-
 from apscheduler.executors.pool import ProcessPoolExecutor
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.blocking import BlockingScheduler
@@ -12,7 +10,10 @@ if not settings.DEBUG:
     import logging
 
     logging.basicConfig(
-        format="%(asctime)s.%(msecs)03d [%(levelname)s] %(module)s.%(funcName)s: %(message)s",
+        format=(
+            "%(asctime)s.%(msecs)03d [%(levelname)s] %(module)s.%(funcName)s: "
+            "%(message)s"
+        ),
         datefmt=r"%H:%M:%S",
     )
     logging.getLogger("apscheduler").setLevel(logging.DEBUG)
