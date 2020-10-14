@@ -42,7 +42,7 @@ def _parse_morele(morele_site):
     old_price = soup.find("div", {"class": "promo-box-old-price"}).get_text(strip=True)
     new_price = soup.find("div", {"class": "promo-box-new-price"}).get_text(strip=True)
 
-    coupon = soup.find("div", {"class": "promo-box-code-value"}).text
+    coupon = soup.find("div", {"class": "promo-box-code-value"}).get_text(strip=True)
 
     description = prepare_description(old_price, new_price, f"kod: {coupon}")
 
