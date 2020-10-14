@@ -32,9 +32,9 @@ def _send_request():
     return requests.get(XKOM_HOT_SHOT_API_URL, params=XKOM_PARAMS, headers=XKOM_HEADERS)
 
 
-def _parse_xkom(hotshot):
+def _parse_xkom(hotshot, skip_date_check: bool = False):
     promotionEnd = datetime.strptime(hotshot["PromotionEnd"], r"%Y-%m-%dT%H:%M:%SZ")
-    if promotionEnd < datetime.now():
+    if not skip_date_check and promotionEnd < datetime.now():
         # fired too soon
         return False
 
