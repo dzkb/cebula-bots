@@ -10,7 +10,6 @@ SQLALCHEMY_JOB_STORE = os.environ.get("SQLALCHEMY_JOB_STORE", "sqlite:///jobs.sq
 
 # Job-specific settings
 XKOM_DISCORD_HOOK_URL = os.environ.get("XKOM_DISCORD_HOOK_URL")
-XKOM_DATA_URL = os.environ.get("XKOM_DATA_URL", "https://x-kom.pl")
 XKOM_RETRY_DELAY_SECS = int(os.environ.get("XKOM_RETRY_DELAY_SECS", "60"))
 
 MORELE_DISCORD_HOOK_URL = os.environ.get("MORELE_DISCORD_HOOK_URL")
