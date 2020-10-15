@@ -60,7 +60,7 @@ def _parse_xkom(hotshot, skip_date_check: bool = False):
 
 def run():
     response = _get_response()
-    offer = _parse_xkom(response.json)
+    offer = _parse_xkom(response.json())
 
     if not offer:
         return JobMisfireError("xkom fired too early")
