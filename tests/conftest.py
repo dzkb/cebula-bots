@@ -2,7 +2,7 @@ import pytest
 
 
 @pytest.fixture
-def xkom_hotshot_html():
+def xkom_hotshot_json():
     return """
 {
     "Id": "12345",

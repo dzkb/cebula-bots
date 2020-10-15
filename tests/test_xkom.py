@@ -10,8 +10,8 @@ def test_xkom_scraping():
     assert type(response.json()) == dict
 
 
-def test_xkom_parsing(xkom_hotshot_html):
-    response = _parse_xkom(loads(xkom_hotshot_html), skip_date_check=True)
+def test_xkom_parsing(xkom_hotshot_json):
+    response = _parse_xkom(loads(xkom_hotshot_json), skip_date_check=True)
 
     assert response.title == "TestProduct"
     assert (
