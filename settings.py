@@ -14,7 +14,6 @@ JOB_MAX_RETRIES = int(os.environ.get("JOB_MAX_RETRIES", "5"))
 
 # Job-specific settings
 XKOM_DISCORD_HOOK_URL = os.environ.get("XKOM_DISCORD_HOOK_URL")
-XKOM_RETRY_DELAY_SECS = int(os.environ.get("XKOM_RETRY_DELAY_SECS", "60"))
 
 MORELE_DISCORD_HOOK_URL = os.environ.get("MORELE_DISCORD_HOOK_URL")
 
