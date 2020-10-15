@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from apscheduler.executors.pool import ProcessPoolExecutor
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.blocking import BlockingScheduler
@@ -5,6 +7,7 @@ from pytz import utc
 
 import jobs
 import settings
+from listener import add_listener
 
 if not settings.DEBUG:
     import logging
@@ -28,6 +31,10 @@ for job in jobs.all_jobs:
     scheduler.add_job(
         func=job.function, id=job.id, trigger=job.trigger, replace_existing=True
     )
+
+add_listener(
+    scheduler, timedelta(seconds=settings.JOB_RETRY_DELAY), settings.JOB_MAX_RETRIES
+)
 
 
 def run():

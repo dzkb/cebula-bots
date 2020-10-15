@@ -1,11 +1,10 @@
-import logging
 from datetime import datetime
-from time import sleep
 
 import requests
 import settings
 from formatters import format_offer_discord
 from hooks import discord_hook
+from listener import JobMisfireError
 
 from jobs.base import Offer, prepare_description
 
@@ -60,42 +59,11 @@ def _parse_xkom(hotshot, skip_date_check: bool = False):
 
 
 def run():
-    retries = 0
-    MAX_RETRIES = 5
+    response = _get_response()
+    offer = _parse_xkom(response.json)
 
-    while retries < MAX_RETRIES:
-        response = _get_response()
-        if response.status_code == 200:
-            try:
-                json_payload = response.json()
-            except ValueError:
-                logging.getLogger("apscheduler").exception(
-                    "xkom_job expected json payload as response but didn't get it! "
-                    "scraping and/or parsing need to be investigated!"
-                )
-                return False
+    if not offer:
+        return JobMisfireError("xkom fired too early")
 
-            try:
-                offer = _parse_xkom(json_payload)
-            except (KeyError, ValueError):
-                logging.getLogger("apscheduler").exception(
-                    "xkom_job received unexpected json payload structure! scraping "
-                    "and/or parsing need to be investigated!"
-                )
-                return False
-
-            if offer:
-                payload = format_offer_discord(offer)
-                discord_hook(settings.XKOM_DISCORD_HOOK_URL, payload)
-                return True
-        retries += 1
-        logging.getLogger("apscheduler").debug(
-            "xkom_job was fired too soon and will retry in "
-            f"{settings.XKOM_RETRY_DELAY_SECS}s ({retries}/{MAX_RETRIES})"
-        )
-        sleep(settings.XKOM_RETRY_DELAY_SECS)
-
-    logging.getLogger("apscheduler").warn(
-        f"xkom_job failed after {MAX_RETRIES} retries"
-    )
-    return False
+    payload = format_offer_discord(offer)
+    discord_hook(settings.XKOM_DISCORD_HOOK_URL, payload)
