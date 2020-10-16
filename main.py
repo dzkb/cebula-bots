@@ -7,7 +7,7 @@ from pytz import utc
 
 import jobs
 import settings
-from listener import add_listener
+from retry import enable_job_retry
 
 if not settings.DEBUG:
     import logging
@@ -32,9 +32,10 @@ for job in jobs.all_jobs:
         func=job.function, id=job.id, trigger=job.trigger, replace_existing=True
     )
 
-add_listener(
-    scheduler, timedelta(seconds=settings.JOB_RETRY_DELAY), settings.JOB_MAX_RETRIES
-)
+if settings.JOB_MAX_RETRIES > 0:
+    enable_job_retry(
+        scheduler, timedelta(seconds=settings.JOB_RETRY_DELAY), settings.JOB_MAX_RETRIES
+    )
 
 
 def run():

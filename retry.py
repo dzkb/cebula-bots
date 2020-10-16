@@ -9,7 +9,7 @@ class JobMisfireError(RuntimeError):
     pass
 
 
-def add_listener(
+def enable_job_retry(
     scheduler: BaseScheduler,
     retry_delay: timedelta,
     max_retries: int,
