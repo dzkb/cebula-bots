@@ -2,20 +2,21 @@ import pytest
 
 
 @pytest.fixture
-def xkom_hotshot_html():
-    return """{
-    "Id": "23290",
+def xkom_hotshot_json():
+    return """
+{
+    "Id": "12345",
     "Product": null,
-    "Price": 249.0,
-    "OldPrice": 369.0,
-    "PromotionGainText": "Oszczędź 120 zł",
+    "Price": 50.0,
+    "OldPrice": 100.0,
+    "PromotionGainText": "Oszczędź 50 zł",
     "PromotionGainTextLines": [
         "Oszczędź",
-        "120 zł"
+        "50 zł"
     ],
-    "PromotionGainValue": 120.0,
-    "PromotionTotalCount": 44,
-    "SaleCount": 44,
+    "PromotionGainValue": 50.0,
+    "PromotionTotalCount": 420,
+    "SaleCount": 69,
     "MaxBuyCount": 0,
     "PromotionName": "TestProduct",
     "PromotionEnd": "2020-10-14T08:00:00Z",

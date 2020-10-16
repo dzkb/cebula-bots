@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from apscheduler.executors.pool import ProcessPoolExecutor
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.blocking import BlockingScheduler
@@ -5,6 +7,7 @@ from pytz import utc
 
 import jobs
 import settings
+from retry import enable_job_retry
 
 if not settings.DEBUG:
     import logging
@@ -27,6 +30,11 @@ scheduler = BlockingScheduler(
 for job in jobs.all_jobs:
     scheduler.add_job(
         func=job.function, id=job.id, trigger=job.trigger, replace_existing=True
+    )
+
+if settings.JOB_MAX_RETRIES > 0:
+    enable_job_retry(
+        scheduler, timedelta(seconds=settings.JOB_RETRY_DELAY), settings.JOB_MAX_RETRIES
     )
 
 

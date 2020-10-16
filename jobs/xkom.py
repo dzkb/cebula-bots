@@ -1,19 +1,17 @@
-import logging
 from datetime import datetime
-from decimal import Decimal
-from time import sleep
 
 import requests
+
 import settings
 from formatters import format_offer_discord
 from hooks import discord_hook
+from jobs.base import Offer, prepare_description
+from retry import JobMisfireError
 
-from jobs.base import Offer
-
-XKOM_HOT_SHOT_URL = "https://x-kom.pl/goracy_strzal"
-XKOM_HOT_SHOT_API_URL = "https://mobileapi.x-kom.pl/api/v1/xkom/hotShots/current"
-XKOM_PARAMS = {"onlyHeader": "true"}
-XKOM_HEADERS = {
+OFFER_URL = "https://x-kom.pl/goracy_strzal"
+URL = "https://mobileapi.x-kom.pl/api/v1/xkom/hotShots/current"
+PARAMS = {"onlyHeader": "true"}
+HEADERS = {
     "accept": "application/json, text/plain, */*",
     "accept-language": "pl-PL,pl;q=0.9,en-US;q=0.8,en;q=0.7",
     "sec-fetch-dest": "empty",
@@ -28,8 +26,8 @@ XKOM_HEADERS = {
 }
 
 
-def _send_request():
-    return requests.get(XKOM_HOT_SHOT_API_URL, params=XKOM_PARAMS, headers=XKOM_HEADERS)
+def _get_response():
+    return requests.get(URL, params=PARAMS, headers=HEADERS)
 
 
 def _parse_xkom(hotshot, skip_date_check: bool = False):
@@ -38,64 +36,34 @@ def _parse_xkom(hotshot, skip_date_check: bool = False):
         # fired too soon
         return False
 
-    title = hotshot["PromotionName"]
+    old_price = str(hotshot["OldPrice"])
+    new_price = str(hotshot["Price"])
 
-    old_price = Decimal(hotshot["OldPrice"])
-    new_price = Decimal(hotshot["Price"])
-    price_diff = Decimal(hotshot["PromotionGainValue"])
-    discount = round(100 * price_diff / old_price)
+    offer_url = OFFER_URL
+    image_url = hotshot["PromotionPhoto"]["ThumbnailUrl"]
+    title = hotshot["PromotionName"]
 
     products_count = hotshot["PromotionTotalCount"]
     sold_count = hotshot["SaleCount"]
 
-    description = f"""~~{old_price} zł~~ → {new_price} zł (-{price_diff}zł/-{discount}%)
-        Sprzedano {sold_count} z {products_count} szt."""
-
-    image_url = hotshot["PromotionPhoto"]["ThumbnailUrl"]
+    description = prepare_description(
+        old_price, new_price, f"Sprzedano {sold_count} z {products_count} szt."
+    )
 
     return Offer(
         title=title,
         description=description,
-        offer_url=XKOM_HOT_SHOT_URL,
+        offer_url=offer_url,
         image_url=image_url,
     )
 
 
 def run():
-    retries = 0
-    MAX_RETRIES = 5
+    response = _get_response()
+    offer = _parse_xkom(response.json())
 
-    while retries < MAX_RETRIES:
-        response = _send_request()
-        if response.status_code == 200:
-            try:
-                offer = _parse_xkom(response.json())
-            except ValueError:
-                logging.getLogger("apscheduler").exception(
-                    "xkom_job expected json payload as response but didn't get it! "
-                    "scraping and/or parsing need to be investigated!"
-                )
-                return False
-            except KeyError:
-                logging.getLogger("apscheduler").exception(
-                    "xkom_job received unexpected json payload structure! scraping "
-                    "and/or parsing need to be investigated!"
-                )
-                return False
-            else:
-                if offer:
-                    payload = format_offer_discord(offer)
-                    discord_hook(settings.XKOM_DISCORD_HOOK_URL, payload)
-                    return True
-                else:
-                    retries += 1
-                    logging.getLogger("apscheduler").debug(
-                        "xkom_job was fired too soon and will retry in "
-                        f"{settings.XKOM_RETRY_DELAY_SECS}s ({retries}/{MAX_RETRIES})"
-                    )
-                    sleep(settings.XKOM_RETRY_DELAY_SECS)
+    if not offer:
+        return JobMisfireError("xkom fired too early")
 
-    logging.getLogger("apscheduler").warn(
-        f"xkom_job failed after {MAX_RETRIES} retries"
-    )
-    return False
+    payload = format_offer_discord(offer)
+    discord_hook(settings.XKOM_DISCORD_HOOK_URL, payload)
