@@ -1,12 +1,12 @@
 from datetime import datetime
 
 import requests
-from listener import JobMisfireError
 
 import settings
 from formatters import format_offer_discord
 from hooks import discord_hook
 from jobs.base import Offer, prepare_description
+from retry import JobMisfireError
 
 OFFER_URL = "https://x-kom.pl/goracy_strzal"
 URL = "https://mobileapi.x-kom.pl/api/v1/xkom/hotShots/current"
