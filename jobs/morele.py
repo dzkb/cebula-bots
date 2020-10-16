@@ -1,9 +1,9 @@
 import requests
-import settings
 from bs4 import BeautifulSoup
+
+import settings
 from formatters import format_offer_discord
 from hooks import discord_hook
-
 from jobs.base import Offer, prepare_description
 
 URL = "https://morele.net"
