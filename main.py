@@ -9,7 +9,7 @@ import jobs
 import settings
 from retry import enable_job_retry
 
-if not settings.DEBUG:
+if settings.DEBUG:
     import logging
 
     logging.basicConfig(
