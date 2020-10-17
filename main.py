@@ -1,13 +1,7 @@
-from datetime import timedelta
+import asyncio
 
-from apscheduler.executors.pool import ProcessPoolExecutor
-from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
-from apscheduler.schedulers.blocking import BlockingScheduler
-from pytz import utc
-
-import jobs
 import settings
-from retry import enable_job_retry
+from scheduler import scheduler
 
 if settings.DEBUG:
     import logging
@@ -20,29 +14,17 @@ if settings.DEBUG:
         datefmt=r"%H:%M:%S",
     )
     logging.getLogger("apscheduler").setLevel(logging.DEBUG)
-
-jobstores = {"default": SQLAlchemyJobStore(url=settings.SQLALCHEMY_JOB_STORE)}
-executors = {"default": ProcessPoolExecutor(5)}
-job_defaults = {"coalesce": True, "max_instances": 1, "misfire_grace_time": 300}
-scheduler = BlockingScheduler(
-    jobstores=jobstores, executors=executors, job_defaults=job_defaults, timezone=utc
-)
-for job in jobs.all_jobs:
-    scheduler.add_job(
-        func=job.function, id=job.id, trigger=job.trigger, replace_existing=True
-    )
-
-if settings.JOB_MAX_RETRIES > 0:
-    enable_job_retry(
-        scheduler, timedelta(seconds=settings.JOB_RETRY_DELAY), settings.JOB_MAX_RETRIES
-    )
+else:
+    logging.getLogger("apscheduler").setLevel(logging.INFO)
 
 
 def run():
+    scheduler.start()
     try:
-        scheduler.start()
+        asyncio.get_event_loop().run_forever()
     except (KeyboardInterrupt, SystemExit):
-        scheduler.shutdown(wait=False)
+        print("Shutting down. Please wait...")
+        scheduler.shutdown(wait=True)
         exit(0)
 
 
