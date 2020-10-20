@@ -3,7 +3,6 @@ from datetime import timedelta
 from apscheduler.executors.pool import ProcessPoolExecutor
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from pytz import utc
 
 import jobs
 import settings
@@ -15,7 +14,6 @@ scheduler = AsyncIOScheduler(
     jobstores=jobstores,
     executors=executors,
     job_defaults=job_defaults,
-    timezone=utc,
 )
 
 for job in jobs.all_jobs:
