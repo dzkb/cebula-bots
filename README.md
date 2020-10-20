@@ -18,6 +18,8 @@ $ pip install -r requirements.txt
 │   ├── base.py     # Base structures
 │   └── <job_name>.py # Job code
 ├── main.py         # Scheduler entrypoint
+├── retry.py        # Job retry function
+├── scheduler.py    # Scheduler intialization
 ├── settings.py
 └── tests
     ├── conftest.py # Fixtures
