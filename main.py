@@ -1,11 +1,10 @@
 import asyncio
+import logging
 
 import settings
 from scheduler import scheduler
 
 if settings.DEBUG:
-    import logging
-
     logging.basicConfig(
         format=(
             "%(asctime)s.%(msecs)03d [%(levelname)s] %(module)s.%(funcName)s: "
