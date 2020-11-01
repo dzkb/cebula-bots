@@ -9,7 +9,7 @@ all_jobs = [
     JobDefinition(
         id="xkom",
         function=xkom,
-        trigger=CronTrigger(hour="9,21", minute="59", second="50"),
+        trigger=CronTrigger(hour="9,21", minute="59", second="59"),
     ),
     JobDefinition(
         id="morele",
