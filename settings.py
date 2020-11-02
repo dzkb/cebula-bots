@@ -6,6 +6,7 @@ load_dotenv()
 
 # Global settings
 DEBUG = os.environ.get("DEBUG", False)
+DEBUG_DISCORD_HOOK_URL = os.environ.get("DEBUG_DISCORD_HOOK_URL")
 SQLALCHEMY_JOB_STORE = os.environ.get("SQLALCHEMY_JOB_STORE", "sqlite:///jobs.sqlite")
 
 # Job retry settings
