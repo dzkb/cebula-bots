@@ -28,7 +28,7 @@ if settings.JOB_MAX_RETRIES > 0:
         scheduler, timedelta(seconds=settings.JOB_RETRY_DELAY), settings.JOB_MAX_RETRIES
     )
 
-if settings.DEBUG:
+if settings.DEBUG_DISCORD_HOOK_URL:
     from exception_logger import enable_job_exception_logging
 
     enable_job_exception_logging(scheduler)
